@@ -6,7 +6,7 @@ services:
     container_name: bookstore-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 0297
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: bookstore
     ports:
       - "5432:5432"
