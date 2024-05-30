@@ -28,8 +28,8 @@ func CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Release()
 
-	sql := `INSERT INTO authors (first_name, last_name, biography, birth_date) VALUES ($1, $2, $3, $4) RETURNING id`
-	err = conn.QueryRow(r.Context(), sql, author.FirstName, author.LastName, author.Biography, author.BirthDate).Scan(&author.ID)
+	query := `INSERT INTO authors (first_name, last_name, biography, birth_date) VALUES ($1, $2, $3, $4) RETURNING id`
+	err = conn.QueryRow(r.Context(), query, author.FirstName, author.LastName, author.Biography, author.BirthDate).Scan(&author.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -48,7 +48,8 @@ func GetAuthors(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Release()
 
-	rows, err := conn.Query(r.Context(), "SELECT id, first_name, last_name, biography, birth_date FROM authors")
+	query := `SELECT id, first_name, last_name, biography, birth_date FROM authors`
+	rows, err := conn.Query(r.Context(), query)
 	if err != nil {
 		log.Println("ошибка выполнения запроса")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -88,8 +89,8 @@ func GetAuthor(w http.ResponseWriter, r *http.Request) {
 	defer conn.Release()
 
 	var author models.Author
-	sql := "SELECT id, first_name, last_name, biography, birth_date FROM authors WHERE id=$1"
-	err = conn.QueryRow(r.Context(), sql, id).Scan(&author.ID, &author.FirstName, &author.LastName, &author.Biography, &author.BirthDate)
+	query := "SELECT id, first_name, last_name, biography, birth_date FROM authors WHERE id=$1"
+	err = conn.QueryRow(r.Context(), query, id).Scan(&author.ID, &author.FirstName, &author.LastName, &author.Biography, &author.BirthDate)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Author not found", http.StatusNotFound)
@@ -127,8 +128,8 @@ func UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Release()
 
-	sql := "UPDATE authors SET first_name=$1, last_name=$2, biography=$3, birth_date=$4 WHERE id=$5"
-	_, err = conn.Exec(r.Context(), sql, author.FirstName, author.LastName, author.Biography, author.BirthDate, author.ID)
+	query := "UPDATE authors SET first_name=$1, last_name=$2, biography=$3, birth_date=$4 WHERE id=$5"
+	_, err = conn.Exec(r.Context(), query, author.FirstName, author.LastName, author.Biography, author.BirthDate, author.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -153,8 +154,8 @@ func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Release()
 
-	sql := "DELETE FROM authors WHERE id=$1"
-	_, err = conn.Exec(r.Context(), sql, id)
+	query := "DELETE FROM authors WHERE id=$1"
+	_, err = conn.Exec(r.Context(), query, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

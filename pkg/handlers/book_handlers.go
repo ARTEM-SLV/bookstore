@@ -27,8 +27,8 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Release()
 
-	sql := `INSERT INTO books (title, author_id, year, isbn) VALUES ($1, $2, $3, $4) RETURNING id`
-	err = conn.QueryRow(r.Context(), sql, book.Title, book.AuthorID, book.Year, book.ISBN).Scan(&book.ID)
+	var query = `INSERT INTO books (title, author_id, year, isbn) VALUES ($1, $2, $3, $4) RETURNING id`
+	err = conn.QueryRow(r.Context(), query, book.Title, book.AuthorID, book.Year, book.ISBN).Scan(&book.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -87,8 +87,8 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	defer conn.Release()
 
 	var book models.Book
-	sql := "SELECT id, title, author_id, year, isbn FROM books WHERE id=$1"
-	err = conn.QueryRow(r.Context(), sql, id).Scan(&book.ID, &book.Title, &book.AuthorID, &book.Year, &book.ISBN)
+	query := `SELECT id, title, author_id, year, isbn FROM books WHERE id=$1`
+	err = conn.QueryRow(r.Context(), query, id).Scan(&book.ID, &book.Title, &book.AuthorID, &book.Year, &book.ISBN)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Book not found", http.StatusNotFound)
@@ -126,8 +126,8 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Release()
 
-	sql := "UPDATE books SET title=$1, author_id=$2, year=$3, isbn=$4 WHERE id=$5"
-	_, err = conn.Exec(r.Context(), sql, book.Title, book.AuthorID, book.Year, book.ISBN, book.ID)
+	query := "UPDATE books SET title=$1, author_id=$2, year=$3, isbn=$4 WHERE id=$5"
+	_, err = conn.Exec(r.Context(), query, book.Title, book.AuthorID, book.Year, book.ISBN, book.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -152,8 +152,8 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Release()
 
-	sql := "DELETE FROM books WHERE id=$1"
-	_, err = conn.Exec(r.Context(), sql, id)
+	query := "DELETE FROM books WHERE id=$1"
+	_, err = conn.Exec(r.Context(), query, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
