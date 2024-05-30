@@ -1,16 +1,19 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
 	"bookstore/config"
 	"bookstore/db"
 	"bookstore/pkg/handlers"
 	"github.com/gorilla/mux"
+	"log"
+	"net/http"
 )
 
 func main() {
+	StartServer()
+}
+
+func StartServer() {
 	cfg := config.LoadConfig()
 	db.InitDB(cfg)
 

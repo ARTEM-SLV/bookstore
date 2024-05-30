@@ -1,5 +1,11 @@
-# Используем официальное изображение Go в качестве базового
-FROM golang
+# Используем конкретную версию официального изображения Go в качестве базового
+FROM golang:1.22
+
+# Устанавливаем утилиту migrate
+RUN apk add --no-cache curl \
+  && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz \
+  && mv migrate.linux-amd64 /usr/local/bin/migrate \
+  && apk del curl
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
@@ -19,5 +25,5 @@ RUN go build -o main ./cmd
 # Открываем порт 8080 для доступа извне
 EXPOSE 8080
 
-# Команда для запуска исполняемого файла
-CMD ["./main"]
+# Команда для запуска миграций и приложения
+CMD migrate -path /app/migrations -database "postgres://postgres:postgres@db:5432/postgres?sslmode=disable" up && ./main

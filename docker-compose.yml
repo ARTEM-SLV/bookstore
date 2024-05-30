@@ -3,29 +3,34 @@ version: '3.8'
 services:
   db:
     image: postgres:16
-    container_name: bookstore-db
+    container_name: bookstore_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: bookstore
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
   app:
-    build: .
-    container_name: bookstore-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bookstore_app
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=postgres
     ports:
       - "8080:8080"
     depends_on:
       - db
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: password
-      DB_NAME: bookstore
+    volumes:
+      - ./migrations:/app/migrations
 
 volumes:
-  postgres_data:
+  db-data:

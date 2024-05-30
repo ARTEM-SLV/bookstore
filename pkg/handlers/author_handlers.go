@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/jackc/pgx/v4"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -49,6 +50,7 @@ func GetAuthors(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := conn.Query(r.Context(), "SELECT id, first_name, last_name, biography, birth_date FROM authors")
 	if err != nil {
+		log.Println("ошибка выполнения запроса")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
