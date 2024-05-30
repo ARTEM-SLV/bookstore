@@ -7,3 +7,11 @@ type Book struct {
 	Year     int    `json:"year"`
 	ISBN     string `json:"isbn"`
 }
+
+type BookWithAuthor struct {
+	ID     int    `json:"id"`
+	Title  string `json:"title"`
+	Author string `json:"author"`
+	Year   int    `json:"year"`
+	ISBN   string `json:"isbn"`
+}

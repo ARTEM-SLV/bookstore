@@ -47,17 +47,18 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Release()
 
-	rows, err := conn.Query(r.Context(), "SELECT id, title, author_id, year, isbn FROM books")
+	query := `SELECT b.id, b.title, CONCAT(a.first_name, ' ', a.last_name) as author, b.year, b.isbn FROM public.books as b INNER JOIN public.authors as a on b.author_id = a.id`
+	rows, err := conn.Query(r.Context(), query)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
-	var books []models.Book
+	var books []models.BookWithAuthor
 	for rows.Next() {
-		var book models.Book
-		err := rows.Scan(&book.ID, &book.Title, &book.AuthorID, &book.Year, &book.ISBN)
+		var book models.BookWithAuthor
+		err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year, &book.ISBN)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
