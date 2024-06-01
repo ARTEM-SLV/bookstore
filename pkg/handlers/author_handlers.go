@@ -1,71 +1,42 @@
 package handlers
 
 import (
+	"bookstore/models"
+	"bookstore/pkg/services"
 	"encoding/json"
+	"fmt"
 	"github.com/jackc/pgx/v4"
-	"log"
 	"net/http"
 	"strconv"
 
-	"bookstore/db"
-	"bookstore/pkg/models"
 	"github.com/gorilla/mux"
 )
 
 // CreateAuthor handles POST /authors
 func CreateAuthor(w http.ResponseWriter, r *http.Request) {
-	var author models.Author
+	var author models.AuthorWithoutTime
 	err := json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	conn, err := db.GetDB().Acquire(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	query := `INSERT INTO authors (first_name, last_name, biography, birth_date) VALUES ($1, $2, $3, $4) RETURNING id`
-	err = conn.QueryRow(r.Context(), query, author.FirstName, author.LastName, author.Biography, author.BirthDate).Scan(&author.ID)
+	id, err := services.CreateAuthor(&author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(author)
+	w.WriteHeader(http.StatusOK)
+	response := fmt.Sprintf("Author created with ID: %d", id)
+	w.Write([]byte(response))
 }
 
 // GetAuthors handles GET /authors
 func GetAuthors(w http.ResponseWriter, r *http.Request) {
-	conn, err := db.GetDB().Acquire(r.Context())
+	authors, err := services.GetAllAuthors()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	query := `SELECT id, first_name, last_name, biography, birth_date FROM authors`
-	rows, err := conn.Query(r.Context(), query)
-	if err != nil {
-		log.Println("ошибка выполнения запроса")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
-
-	var authors []models.Author
-	for rows.Next() {
-		var author models.Author
-		err := rows.Scan(&author.ID, &author.FirstName, &author.LastName, &author.Biography, &author.BirthDate)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		authors = append(authors, author)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -81,23 +52,15 @@ func GetAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn, err := db.GetDB().Acquire(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	var author models.Author
-	query := "SELECT id, first_name, last_name, biography, birth_date FROM authors WHERE id=$1"
-	err = conn.QueryRow(r.Context(), query, id).Scan(&author.ID, &author.FirstName, &author.LastName, &author.Biography, &author.BirthDate)
+	author, err := services.GetAuthorByID(id)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Author not found", http.StatusNotFound)
+			return
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -113,7 +76,7 @@ func UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var author models.Author
+	var author models.AuthorWithoutTime
 	err = json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -121,21 +84,15 @@ func UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 	author.ID = id
 
-	conn, err := db.GetDB().Acquire(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	query := "UPDATE authors SET first_name=$1, last_name=$2, biography=$3, birth_date=$4 WHERE id=$5"
-	_, err = conn.Exec(r.Context(), query, author.FirstName, author.LastName, author.Biography, author.BirthDate, author.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	err = services.UpdateAuthor(&author)
+	if err == pgx.ErrNoRows {
+		http.Error(w, "Author not found", http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
+	response := "Author updated"
+	w.Write([]byte(response))
 }
 
 // DeleteAuthor handles DELETE /authors/{id}
@@ -147,19 +104,13 @@ func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn, err := db.GetDB().Acquire(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	query := "DELETE FROM authors WHERE id=$1"
-	_, err = conn.Exec(r.Context(), query, id)
-	if err != nil {
+	err = services.DeleteAuthor(id)
+	if err == pgx.ErrNoRows {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
+	response := "the author has been successfully removed along with all books by this author"
+	w.Write([]byte(response))
 }

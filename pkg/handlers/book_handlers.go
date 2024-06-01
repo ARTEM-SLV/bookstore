@@ -1,13 +1,14 @@
 package handlers
 
 import (
+	"bookstore/models"
+	"bookstore/pkg/services"
 	"encoding/json"
+	"fmt"
 	"github.com/jackc/pgx/v4"
 	"net/http"
 	"strconv"
 
-	"bookstore/db"
-	"bookstore/pkg/models"
 	"github.com/gorilla/mux"
 )
 
@@ -20,50 +21,22 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn, err := db.GetDB().Acquire(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	var query = `INSERT INTO books (title, author_id, year, isbn) VALUES ($1, $2, $3, $4) RETURNING id`
-	err = conn.QueryRow(r.Context(), query, book.Title, book.AuthorID, book.Year, book.ISBN).Scan(&book.ID)
+	id, err := services.CreateBook(&book)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(book)
+	w.WriteHeader(http.StatusOK)
+	response := fmt.Sprintf("Book created with ID: %d", id)
+	w.Write([]byte(response))
 }
 
 // GetBooks handles GET /books
 func GetBooks(w http.ResponseWriter, r *http.Request) {
-	conn, err := db.GetDB().Acquire(r.Context())
+	books, err := services.GetAllBooks()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	query := `SELECT b.id, b.title, CONCAT(a.first_name, ' ', a.last_name) as author, b.year, b.isbn FROM public.books as b INNER JOIN public.authors as a on b.author_id = a.id`
-	rows, err := conn.Query(r.Context(), query)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
-
-	var books []models.BookWithAuthor
-	for rows.Next() {
-		var book models.BookWithAuthor
-		err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year, &book.ISBN)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		books = append(books, book)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -79,16 +52,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn, err := db.GetDB().Acquire(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	var book models.Book
-	query := `SELECT id, title, author_id, year, isbn FROM books WHERE id=$1`
-	err = conn.QueryRow(r.Context(), query, id).Scan(&book.ID, &book.Title, &book.AuthorID, &book.Year, &book.ISBN)
+	book, err := services.GetBookByID(id)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Book not found", http.StatusNotFound)
@@ -119,21 +83,15 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 	book.ID = id
 
-	conn, err := db.GetDB().Acquire(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	query := "UPDATE books SET title=$1, author_id=$2, year=$3, isbn=$4 WHERE id=$5"
-	_, err = conn.Exec(r.Context(), query, book.Title, book.AuthorID, book.Year, book.ISBN, book.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	err = services.UpdateBook(&book)
+	if err == pgx.ErrNoRows {
+		http.Error(w, "Book not found", http.StatusNotFound)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
+	response := "Author updated"
+	w.Write([]byte(response))
 }
 
 // DeleteBook handles DELETE /books/{id}
@@ -145,19 +103,11 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn, err := db.GetDB().Acquire(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Release()
-
-	query := "DELETE FROM books WHERE id=$1"
-	_, err = conn.Exec(r.Context(), query, id)
-	if err != nil {
+	err = services.DeleteBook(id)
+	if err == pgx.ErrNoRows {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }
