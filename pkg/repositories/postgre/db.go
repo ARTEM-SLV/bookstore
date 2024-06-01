@@ -1,4 +1,4 @@
-package db
+package postgre
 
 import (
 	"context"
@@ -11,6 +11,12 @@ import (
 )
 
 var pool *pgxpool.Pool
+var ctx = context.Background()
+
+func InitRepository() {
+	cfg := config.LoadConfig()
+	InitDB(cfg)
+}
 
 func InitDB(cfg *config.Config) {
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
