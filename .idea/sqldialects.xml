@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/db/migrations/001_create_books.up.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/db/migrations/002_create_authors.up.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/pkg/handlers/author_handlers.go" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/pkg/repositories/postgre/migrations/001_create_books.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/pkg/repositories/postgre/migrations/002_create_authors.up.sql" dialect="GenericSQL" />
   </component>
 </project>
