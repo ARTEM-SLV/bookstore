@@ -1,13 +1,10 @@
 package handlers
 
 import (
-	"bookstore/pkg/services"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
-
-var srv = services.NewServices()
 
 func InitHandlerMux() {
 	r := mux.NewRouter()
