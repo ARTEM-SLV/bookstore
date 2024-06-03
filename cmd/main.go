@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	repositories.InitServicePG()
-	handlers.InitHandler()
+	repositories.InitRepositoryPG()
+	handlers.InitHandlerMux()
 }

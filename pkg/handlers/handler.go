@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func InitHandler() {
+func InitHandlerMux() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/books", CreateBook).Methods("POST")

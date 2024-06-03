@@ -22,7 +22,7 @@ type AuthorRepository interface {
 	DeleteAuthor(id int) error
 }
 
-func InitServicePG() {
+func InitRepositoryPG() {
 	cfg := config.LoadConfig()
 	postgre.InitDB(cfg)
 }
