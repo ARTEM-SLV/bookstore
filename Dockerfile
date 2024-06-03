@@ -7,8 +7,8 @@ FROM golang:1.22
 #  && mv migrate.linux-amd64 /usr/local/bin/migrate \
 #  && apk del curl
 
-## Устанавливаем зависимости
-#RUN apk add --no-cache git
+# Устанавливаем зависимости
+RUN apk add --no-cache git
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
@@ -24,6 +24,12 @@ COPY . .
 
 # Сборка Go-приложения
 RUN go build -o main ./cmd
+
+## Копируем файлы миграций
+#COPY ./repositories/migrations ./migrations
+
+## Выполняем миграции
+#CMD ["sh", "-c", "migrate -path ./repositories/migrations -database $DATABASE_URL up && ./main"]
 
 # Устанавливаем команду для запуска приложения
 CMD ["./main"]

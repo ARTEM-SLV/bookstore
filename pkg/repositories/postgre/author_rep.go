@@ -16,7 +16,7 @@ func NewAuthorRepository() *authorPgRepository {
 	return &a
 }
 
-func (a authorPgRepository) CreateAuthor(author *models.AuthorWithoutTime) (int, error) {
+func (a authorPgRepository) CreateAuthor(author *models.AuthorTimeS) (int, error) {
 	conn, err := GetDB().Acquire(a.ctx)
 	if err != nil {
 		return 0, err
@@ -79,7 +79,7 @@ func (a authorPgRepository) GetAuthorByID(id int) (*models.Author, error) {
 	return &author, nil
 }
 
-func (a authorPgRepository) UpdateAuthor(author *models.AuthorWithoutTime) error {
+func (a authorPgRepository) UpdateAuthor(author *models.AuthorTimeS) error {
 	conn, err := GetDB().Acquire(a.ctx)
 	if err != nil {
 		return err

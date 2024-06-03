@@ -2,10 +2,7 @@ package services
 
 import (
 	"bookstore/models"
-	"bookstore/pkg/repositories/postgre"
 )
-
-var bookRep = postgre.NewBookRepository()
 
 func CreateBook(book *models.Book) (int, error) {
 	return bookRep.CreateBook(book)

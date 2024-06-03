@@ -13,13 +13,13 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5435/postgres?sslmode=disable
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres?sslmode=disable
 
   db:
     image: postgres:16
     #    restart: always
     ports:
-      - "5435:5432"
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

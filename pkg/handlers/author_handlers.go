@@ -14,7 +14,7 @@ import (
 
 // CreateAuthor handles POST /authors
 func CreateAuthor(w http.ResponseWriter, r *http.Request) {
-	var author models.AuthorWithoutTime
+	var author models.AuthorTimeS
 	err := json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -76,7 +76,7 @@ func UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var author models.AuthorWithoutTime
+	var author models.AuthorTimeS
 	err = json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

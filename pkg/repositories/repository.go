@@ -15,11 +15,16 @@ type BookRepository interface {
 }
 
 type AuthorRepository interface {
-	CreateAuthor(author *models.AuthorWithoutTime) (int, error)
+	CreateAuthor(author *models.AuthorTimeS) (int, error)
 	GetAllAuthors() ([]*models.Author, error)
 	GetAuthorByID(id int) (*models.Author, error)
-	UpdateAuthor(author *models.AuthorWithoutTime) error
+	UpdateAuthor(author *models.AuthorTimeS) error
 	DeleteAuthor(id int) error
+}
+
+type AuthorAndBookRepository interface {
+	UpdateBookAndAuthor(book *models.Book, author *models.AuthorTimeS) error
+	GetAuthorAndBooks(id int) (*models.Author, []*models.BookWithAuthor, error)
 }
 
 func InitRepositoryPG() {

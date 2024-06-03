@@ -10,7 +10,7 @@ type Author struct {
 	BirthDate time.Time `json:"birth_date"`
 }
 
-type AuthorWithoutTime struct {
+type AuthorTimeS struct {
 	ID        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
