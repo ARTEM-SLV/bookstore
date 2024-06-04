@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"bookstore/config"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/jackc/pgx/v4/pgxpool"
+	_ "github.com/jackc/pgx/v4/stdlib" // Импортируем pgx драйвер
 )
 
 var pool *pgxpool.Pool

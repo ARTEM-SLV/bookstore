@@ -14,10 +14,10 @@ RUN go mod download
 COPY . .
 
 # Копируем файлы миграций в контейнер
-COPY ./pkg/repositories/migrations ./migrations
+COPY ./migrations ./migrations
 
 # Устанавливаем утилиту для миграций
-RUN go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+RUN go install -tags "postgres,mysql" github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 # Сборка Go-приложения
 RUN go build -o main ./cmd
