@@ -14,5 +14,3 @@ CREATE TABLE books (
     isbn VARCHAR(20) UNIQUE,
     FOREIGN KEY (author_id) REFERENCES authors(id)
 );
-
-CREATE INDEX idx_books_author_id ON books (author_id);

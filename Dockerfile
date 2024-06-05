@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Копируем файлы миграций в контейнер
-COPY ./migrations ./migrations
+COPY ./schema ./schema
 
 # Устанавливаем утилиту для миграций
 RUN go install -tags "postgres,mysql" github.com/golang-migrate/migrate/v4/cmd/migrate@latest
@@ -23,10 +23,7 @@ RUN go install -tags "postgres,mysql" github.com/golang-migrate/migrate/v4/cmd/m
 RUN go build -o main ./cmd
 
 # Выполняем миграции и запускаем приложение
-CMD ["sh", "-c", "migrate -path ./migrations -database $DATABASE_URL up && ./main"]
-
-## Устанавливаем команду для запуска приложения
-#CMD ["./main"]
+CMD ["sh", "-c", "migrate -path ./schema -database $DATABASE_URL up && ./main"]
 
 # Открываем порт 8080 для доступа извне
 EXPOSE 8080
