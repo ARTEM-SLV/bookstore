@@ -72,7 +72,9 @@ DELETE /authors/{id}:
 URL: http://localhost:8080/authors/1
 ```
 
+```sh
 PUT /books/{book_id}/authors/{author_id}:
 Метод: PUT
 URL: http://localhost:8080/books/1/authors/1
 Тело запроса: JSON (как указано выше)
+```
