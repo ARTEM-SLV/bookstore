@@ -47,8 +47,3 @@ func NewRepository() *Repository {
 
 	return &r
 }
-
-//func InitRepositoryPG() {
-//	cfg := config.LoadConfig()
-//	postgre.InitDB(cfg)
-//}

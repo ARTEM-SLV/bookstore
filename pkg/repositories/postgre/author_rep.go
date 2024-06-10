@@ -2,9 +2,8 @@ package postgre
 
 import (
 	"context"
-	"log"
-
 	"github.com/jackc/pgx/v4/pgxpool"
+	"log"
 
 	"bookstore/models"
 )

@@ -3,13 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v4"
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
-	"github.com/jackc/pgx/v4"
-
-	"bookstore/models"
 	"bookstore/pkg/services"
 )
 
@@ -23,14 +21,9 @@ func NewAuthorHandler(authorSrv *services.AuthorService) *AuthorHandler {
 
 // CreateAuthor handles POST /authors
 func (a AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
-	var author models.Author
-	err := json.NewDecoder(r.Body).Decode(&author)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	dec := json.NewDecoder(r.Body)
 
-	id, err := a.authorSrv.CreateAuthor(r.Context(), &author)
+	id, err := a.authorSrv.CreateAuthor(r.Context(), dec)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -85,15 +78,9 @@ func (a AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var author models.Author
-	err = json.NewDecoder(r.Body).Decode(&author)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	author.ID = id
+	dec := json.NewDecoder(r.Body)
 
-	err = a.authorSrv.UpdateAuthor(r.Context(), &author)
+	err = a.authorSrv.UpdateAuthor(r.Context(), dec, id)
 	if err == pgx.ErrNoRows {
 		http.Error(w, "Author not found", http.StatusInternalServerError)
 		return
