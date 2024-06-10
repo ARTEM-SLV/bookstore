@@ -1,9 +1,21 @@
 package services
 
 import (
-	"bookstore/pkg/repositories/postgre"
+	"bookstore/pkg/repositories"
 )
 
-var bookRep = postgre.NewBookRepository()
-var authorRep = postgre.NewAuthorRepository()
-var authorAndBookRep = postgre.NewAuthorAndBookRepository()
+type Service struct {
+	BookSrv          *BookService
+	AuthorSrv        *AuthorService
+	AuthorAndBookSrv *AuthorAndBookService
+}
+
+func NewService(rep *repositories.Repository) *Service {
+	s := Service{
+		BookSrv:          NewBookService(rep.BookRepository),
+		AuthorSrv:        NewAuthorService(rep.AuthorRepository),
+		AuthorAndBookSrv: NewAuthorAndBookService(rep.AuthorAndBookRepository),
+	}
+
+	return &s
+}

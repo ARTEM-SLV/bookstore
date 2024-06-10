@@ -6,15 +6,16 @@ import (
 	"log"
 	"time"
 
-	"bookstore/config"
-	//_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/jackc/pgx/v4/pgxpool"
-	//_ "github.com/jackc/pgx/v4/stdlib" // Импортируем pgx драйвер
+
+	"bookstore/config"
 )
 
-var pool *pgxpool.Pool
+//var pool *pgxpool.Pool
 
-func InitDB(cfg *config.Config) {
+func InitDB(cfg *config.Config) *pgxpool.Pool {
+	var pool *pgxpool.Pool
+
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
 	var err error
 	pool, err = pgxpool.Connect(context.Background(), dsn)
@@ -31,8 +32,10 @@ func InitDB(cfg *config.Config) {
 	}
 
 	log.Println("Connected to database")
-}
 
-func GetDB() *pgxpool.Pool {
 	return pool
 }
+
+//func GetDB() *pgxpool.Pool {
+//	return pool
+//}

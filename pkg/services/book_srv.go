@@ -1,25 +1,36 @@
 package services
 
 import (
+	"context"
+
 	"bookstore/models"
+	"bookstore/pkg/repositories/postgre"
 )
 
-func CreateBook(book *models.Book) (int, error) {
-	return bookRep.CreateBook(book)
+type BookService struct {
+	bookRep *postgre.BookPgRepository
 }
 
-func GetAllBooks() ([]*models.BookAuthor, error) {
-	return bookRep.GetAllBooks()
+func NewBookService(bookRep *postgre.BookPgRepository) *BookService {
+	return &BookService{bookRep: bookRep}
 }
 
-func GetBookByID(id int) (*models.Book, error) {
-	return bookRep.GetBookByID(id)
+func (b BookService) CreateBook(ctx context.Context, book *models.Book) (int, error) {
+	return b.bookRep.CreateBook(ctx, book)
 }
 
-func UpdateBook(book *models.Book) error {
-	return bookRep.UpdateBook(book)
+func (b BookService) GetAllBooks(ctx context.Context) ([]*models.Book, error) {
+	return b.bookRep.GetAllBooks(ctx)
 }
 
-func DeleteBook(id int) error {
-	return bookRep.DeleteBook(id)
+func (b BookService) GetBookByID(ctx context.Context, id int) (*models.Book, error) {
+	return b.bookRep.GetBookByID(ctx, id)
+}
+
+func (b BookService) UpdateBook(ctx context.Context, book *models.Book) error {
+	return b.bookRep.UpdateBook(ctx, book)
+}
+
+func (b BookService) DeleteBook(ctx context.Context, id int) error {
+	return b.bookRep.DeleteBook(ctx, id)
 }

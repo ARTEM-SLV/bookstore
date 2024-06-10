@@ -1,30 +1,31 @@
 package postgre
 
 import (
-	"bookstore/models"
 	"context"
 	"log"
+
+	"github.com/jackc/pgx/v4/pgxpool"
+
+	"bookstore/models"
 )
 
-type authorPgRepository struct {
-	ctx context.Context
+type AuthorPgRepository struct {
+	pool *pgxpool.Pool
 }
 
-func NewAuthorRepository() *authorPgRepository {
-	a := authorPgRepository{ctx: context.Background()}
-
-	return &a
+func NewAuthorRepository(pool *pgxpool.Pool) *AuthorPgRepository {
+	return &AuthorPgRepository{pool: pool}
 }
 
-func (a authorPgRepository) CreateAuthor(author *models.AuthorTimeS) (int, error) {
-	conn, err := GetDB().Acquire(a.ctx)
+func (a AuthorPgRepository) CreateAuthor(ctx context.Context, author *models.Author) (int, error) {
+	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
 		return 0, err
 	}
 	defer conn.Release()
 
 	query := `INSERT INTO authors (first_name, last_name, biography, birth_date) VALUES ($1, $2, $3, $4) RETURNING id`
-	err = conn.QueryRow(a.ctx, query, author.FirstName, author.LastName, author.Biography, author.BirthDate).Scan(&author.ID)
+	err = conn.QueryRow(ctx, query, author.FirstName, author.LastName, author.Biography, author.BirthDate).Scan(&author.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -32,17 +33,17 @@ func (a authorPgRepository) CreateAuthor(author *models.AuthorTimeS) (int, error
 	return author.ID, nil
 }
 
-func (a authorPgRepository) GetAllAuthors() ([]*models.Author, error) {
+func (a AuthorPgRepository) GetAllAuthors(ctx context.Context) ([]*models.Author, error) {
 	var authors []*models.Author
 
-	conn, err := GetDB().Acquire(a.ctx)
+	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
 		return authors, err
 	}
 	defer conn.Release()
 
 	query := `SELECT id, first_name, last_name, biography, birth_date FROM authors`
-	rows, err := conn.Query(a.ctx, query)
+	rows, err := conn.Query(ctx, query)
 	if err != nil {
 		log.Println("ошибка выполнения запроса")
 		return authors, err
@@ -61,17 +62,17 @@ func (a authorPgRepository) GetAllAuthors() ([]*models.Author, error) {
 	return authors, nil
 }
 
-func (a authorPgRepository) GetAuthorByID(id int) (*models.Author, error) {
+func (a AuthorPgRepository) GetAuthorByID(ctx context.Context, id int) (*models.Author, error) {
 	var author models.Author
 
-	conn, err := GetDB().Acquire(a.ctx)
+	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
 		return &author, err
 	}
 	defer conn.Release()
 
 	query := "SELECT id, first_name, last_name, biography, birth_date FROM authors WHERE id=$1"
-	err = conn.QueryRow(a.ctx, query, id).Scan(&author.ID, &author.FirstName, &author.LastName, &author.Biography, &author.BirthDate)
+	err = conn.QueryRow(ctx, query, id).Scan(&author.ID, &author.FirstName, &author.LastName, &author.Biography, &author.BirthDate)
 	if err != nil {
 		return &author, err
 	}
@@ -79,15 +80,15 @@ func (a authorPgRepository) GetAuthorByID(id int) (*models.Author, error) {
 	return &author, nil
 }
 
-func (a authorPgRepository) UpdateAuthor(author *models.AuthorTimeS) error {
-	conn, err := GetDB().Acquire(a.ctx)
+func (a AuthorPgRepository) UpdateAuthor(ctx context.Context, author *models.Author) error {
+	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 	defer conn.Release()
 
 	query := "UPDATE authors SET first_name=$1, last_name=$2, biography=$3, birth_date=$4 WHERE id=$5"
-	_, err = conn.Exec(a.ctx, query, author.FirstName, author.LastName, author.Biography, author.BirthDate, author.ID)
+	_, err = conn.Exec(ctx, query, author.FirstName, author.LastName, author.Biography, author.BirthDate, author.ID)
 	if err != nil {
 		return err
 	}
@@ -95,26 +96,26 @@ func (a authorPgRepository) UpdateAuthor(author *models.AuthorTimeS) error {
 	return nil
 }
 
-func (a authorPgRepository) DeleteAuthor(id int) error {
-	tx, err := GetDB().Begin(a.ctx)
+func (a AuthorPgRepository) DeleteAuthor(ctx context.Context, id int) error {
+	tx, err := a.pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(a.ctx)
+	defer tx.Rollback(ctx)
 
 	query := "DELETE FROM books WHERE author_id=$1"
-	_, err = tx.Exec(a.ctx, query, id)
+	_, err = tx.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
 
 	query = "DELETE FROM authors WHERE id=$1"
-	_, err = tx.Exec(a.ctx, query, id)
+	_, err = tx.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
 
-	if err := tx.Commit(a.ctx); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		return err
 	}
 

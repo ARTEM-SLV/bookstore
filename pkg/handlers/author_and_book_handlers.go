@@ -1,22 +1,32 @@
 package handlers
 
 import (
-	"bookstore/models"
-	"bookstore/pkg/services"
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/jackc/pgx/v4"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v4"
+
+	"bookstore/models"
+	"bookstore/pkg/services"
 )
 
 type UpdateRequest struct {
-	Book   models.Book        `json:"book"`
-	Author models.AuthorTimeS `json:"author"`
+	Book   models.Book   `json:"book"`
+	Author models.Author `json:"author"`
+}
+
+type AuthorAndBookHandler struct {
+	abSrv *services.AuthorAndBookService
+}
+
+func NewAuthorAndBookHandler(abSrv *services.AuthorAndBookService) *AuthorAndBookHandler {
+	return &AuthorAndBookHandler{abSrv: abSrv}
 }
 
 // UpdateBookAndAuthor handles PUT /books/{book_id}/authors/{author_id}
-func UpdateBookAndAuthor(w http.ResponseWriter, r *http.Request) {
+func (ab AuthorAndBookHandler) UpdateBookAndAuthor(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	bookID, err := strconv.Atoi(vars["book_id"])
 	if err != nil {
@@ -44,7 +54,7 @@ func UpdateBookAndAuthor(w http.ResponseWriter, r *http.Request) {
 	book := updateRequest.Book
 	author := updateRequest.Author
 
-	err = services.UpdateBookAndAuthor(&book, &author)
+	err = ab.abSrv.UpdateBookAndAuthor(r.Context(), &book, &author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -56,7 +66,7 @@ func UpdateBookAndAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAuthorAndBooks handles GET /author_with_books/{id}
-func GetAuthorAndBooks(w http.ResponseWriter, r *http.Request) {
+func (ab AuthorAndBookHandler) GetAuthorAndBooks(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -64,7 +74,7 @@ func GetAuthorAndBooks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	author, books, err := services.GetAuthorAndBooks(id)
+	author, books, err := ab.abSrv.GetAuthorAndBooks(r.Context(), id)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Author not found", http.StatusNotFound)

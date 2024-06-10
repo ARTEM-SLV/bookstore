@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"bookstore/models"
-	"bookstore/pkg/services"
 	"encoding/json"
 	"fmt"
 	"github.com/jackc/pgx/v4"
@@ -10,10 +8,21 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+
+	"bookstore/models"
+	"bookstore/pkg/services"
 )
 
+type BookHandler struct {
+	bookSrv *services.BookService
+}
+
+func NeyBookHandler(bookSrv *services.BookService) *BookHandler {
+	return &BookHandler{bookSrv: bookSrv}
+}
+
 // CreateBook handles POST /books
-func CreateBook(w http.ResponseWriter, r *http.Request) {
+func (b BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	var book models.Book
 	err := json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
@@ -21,7 +30,7 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := services.CreateBook(&book)
+	id, err := b.bookSrv.CreateBook(r.Context(), &book)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -33,8 +42,8 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetBooks handles GET /books
-func GetBooks(w http.ResponseWriter, r *http.Request) {
-	books, err := services.GetAllBooks()
+func (b BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
+	books, err := b.bookSrv.GetAllBooks(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -44,7 +53,7 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetBook handles GET /books/{id}
-func GetBook(w http.ResponseWriter, r *http.Request) {
+func (b BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -52,7 +61,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	book, err := services.GetBookByID(id)
+	book, err := b.bookSrv.GetBookByID(r.Context(), id)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Book not found", http.StatusNotFound)
@@ -67,7 +76,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateBook handles PUT /books/{id}
-func UpdateBook(w http.ResponseWriter, r *http.Request) {
+func (b BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -83,7 +92,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 	book.ID = id
 
-	err = services.UpdateBook(&book)
+	err = b.bookSrv.UpdateBook(r.Context(), &book)
 	if err == pgx.ErrNoRows {
 		http.Error(w, "Book not found", http.StatusNotFound)
 		return
@@ -95,7 +104,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteBook handles DELETE /books/{id}
-func DeleteBook(w http.ResponseWriter, r *http.Request) {
+func (b BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -103,7 +112,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = services.DeleteBook(id)
+	err = b.bookSrv.DeleteBook(r.Context(), id)
 	if err == pgx.ErrNoRows {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

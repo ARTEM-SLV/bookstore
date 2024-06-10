@@ -1,25 +1,36 @@
 package services
 
 import (
+	"context"
+
 	"bookstore/models"
+	"bookstore/pkg/repositories/postgre"
 )
 
-func CreateAuthor(author *models.AuthorTimeS) (int, error) {
-	return authorRep.CreateAuthor(author)
+type AuthorService struct {
+	authorRep *postgre.AuthorPgRepository
 }
 
-func GetAllAuthors() ([]*models.Author, error) {
-	return authorRep.GetAllAuthors()
+func NewAuthorService(authorRep *postgre.AuthorPgRepository) *AuthorService {
+	return &AuthorService{authorRep: authorRep}
 }
 
-func GetAuthorByID(id int) (*models.Author, error) {
-	return authorRep.GetAuthorByID(id)
+func (a AuthorService) CreateAuthor(ctx context.Context, author *models.Author) (int, error) {
+	return a.authorRep.CreateAuthor(ctx, author)
 }
 
-func UpdateAuthor(author *models.AuthorTimeS) error {
-	return authorRep.UpdateAuthor(author)
+func (a AuthorService) GetAllAuthors(ctx context.Context) ([]*models.Author, error) {
+	return a.authorRep.GetAllAuthors(ctx)
 }
 
-func DeleteAuthor(id int) error {
-	return authorRep.DeleteAuthor(id)
+func (a AuthorService) GetAuthorByID(ctx context.Context, id int) (*models.Author, error) {
+	return a.authorRep.GetAuthorByID(ctx, id)
+}
+
+func (a AuthorService) UpdateAuthor(ctx context.Context, author *models.Author) error {
+	return a.authorRep.UpdateAuthor(ctx, author)
+}
+
+func (a AuthorService) DeleteAuthor(ctx context.Context, id int) error {
+	return a.authorRep.DeleteAuthor(ctx, id)
 }

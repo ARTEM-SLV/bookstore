@@ -1,27 +1,36 @@
 package handlers
 
 import (
-	"bookstore/models"
-	"bookstore/pkg/services"
 	"encoding/json"
 	"fmt"
-	"github.com/jackc/pgx/v4"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v4"
+
+	"bookstore/models"
+	"bookstore/pkg/services"
 )
 
+type AuthorHandler struct {
+	authorSrv *services.AuthorService
+}
+
+func NewAuthorHandler(authorSrv *services.AuthorService) *AuthorHandler {
+	return &AuthorHandler{authorSrv: authorSrv}
+}
+
 // CreateAuthor handles POST /authors
-func CreateAuthor(w http.ResponseWriter, r *http.Request) {
-	var author models.AuthorTimeS
+func (a AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
+	var author models.Author
 	err := json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	id, err := services.CreateAuthor(&author)
+	id, err := a.authorSrv.CreateAuthor(r.Context(), &author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -33,8 +42,8 @@ func CreateAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAuthors handles GET /authors
-func GetAuthors(w http.ResponseWriter, r *http.Request) {
-	authors, err := services.GetAllAuthors()
+func (a AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request) {
+	authors, err := a.authorSrv.GetAllAuthors(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -44,7 +53,7 @@ func GetAuthors(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAuthor handles GET /authors/{id}
-func GetAuthor(w http.ResponseWriter, r *http.Request) {
+func (a AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -52,7 +61,7 @@ func GetAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	author, err := services.GetAuthorByID(id)
+	author, err := a.authorSrv.GetAuthorByID(r.Context(), id)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Author not found", http.StatusNotFound)
@@ -68,7 +77,7 @@ func GetAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateAuthor handles PUT /authors/{id}
-func UpdateAuthor(w http.ResponseWriter, r *http.Request) {
+func (a AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -76,7 +85,7 @@ func UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var author models.AuthorTimeS
+	var author models.Author
 	err = json.NewDecoder(r.Body).Decode(&author)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -84,7 +93,7 @@ func UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 	author.ID = id
 
-	err = services.UpdateAuthor(&author)
+	err = a.authorSrv.UpdateAuthor(r.Context(), &author)
 	if err == pgx.ErrNoRows {
 		http.Error(w, "Author not found", http.StatusInternalServerError)
 		return
@@ -96,7 +105,7 @@ func UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteAuthor handles DELETE /authors/{id}
-func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
+func (a AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -104,7 +113,7 @@ func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = services.DeleteAuthor(id)
+	err = a.authorSrv.DeleteAuthor(r.Context(), id)
 	if err == pgx.ErrNoRows {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
