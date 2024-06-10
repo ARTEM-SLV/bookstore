@@ -11,8 +11,6 @@ import (
 	"bookstore/config"
 )
 
-//var pool *pgxpool.Pool
-
 func InitDB(cfg *config.Config) *pgxpool.Pool {
 	var pool *pgxpool.Pool
 
@@ -35,7 +33,3 @@ func InitDB(cfg *config.Config) *pgxpool.Pool {
 
 	return pool
 }
-
-//func GetDB() *pgxpool.Pool {
-//	return pool
-//}

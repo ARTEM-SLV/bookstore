@@ -1,16 +1,13 @@
 package handlers
 
 import (
-	"log"
-	"net/http"
-
 	"github.com/gorilla/mux"
 
 	"bookstore/pkg/services"
 )
 
-func InitHandler(srv *services.Service) {
-	b := NeyBookHandler(srv.BookSrv)
+func NewHandler(srv *services.Service) *mux.Router {
+	b := NewBookHandler(srv.BookSrv)
 	a := NewAuthorHandler(srv.AuthorSrv)
 	ab := NewAuthorAndBookHandler(srv.AuthorAndBookSrv)
 
@@ -31,7 +28,5 @@ func InitHandler(srv *services.Service) {
 	r.HandleFunc("/books/{book_id}/authors/{author_id}", ab.UpdateBookAndAuthor).Methods("PUT")
 	r.HandleFunc("/author_with_books/{id}", ab.GetAuthorAndBooks).Methods("GET")
 
-	http.Handle("/", r)
-	log.Println("Starting server on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	return r
 }

@@ -3,11 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jackc/pgx/v4"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v4"
 
 	"bookstore/models"
 	"bookstore/pkg/services"
@@ -17,7 +17,7 @@ type BookHandler struct {
 	bookSrv *services.BookService
 }
 
-func NeyBookHandler(bookSrv *services.BookService) *BookHandler {
+func NewBookHandler(bookSrv *services.BookService) *BookHandler {
 	return &BookHandler{bookSrv: bookSrv}
 }
 

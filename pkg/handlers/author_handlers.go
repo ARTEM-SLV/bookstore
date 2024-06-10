@@ -3,10 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/jackc/pgx/v4"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v4"
 
 	"bookstore/pkg/services"
 )

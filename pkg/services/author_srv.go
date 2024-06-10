@@ -75,7 +75,7 @@ func parseAuthor(receiver *models.Author, source *author) error {
 	receiver.LastName = source.LastName
 	receiver.Biography = source.Biography
 
-	BirthDate, err := time.Parse("2006-01-02", source.BirthDate)
+	BirthDate, err := time.Parse(time.DateOnly, source.BirthDate)
 	if err != nil {
 		return err
 	}
