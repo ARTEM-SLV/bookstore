@@ -11,11 +11,6 @@ import (
 	"bookstore/pkg/services"
 )
 
-//type UpdateRequest struct {
-//	Book   models.Book   `json:"book"`
-//	Author models.Author `json:"author"`
-//}
-
 type AuthorAndBookHandler struct {
 	abSrv *services.AuthorAndBookService
 }
