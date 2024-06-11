@@ -61,6 +61,7 @@ func (a AuthorService) UpdateAuthor(ctx context.Context, dec *json.Decoder, id i
 	if err != nil {
 		return err
 	}
+	mAuthor.ID = id
 
 	return a.authorRep.UpdateAuthor(ctx, &mAuthor)
 }
