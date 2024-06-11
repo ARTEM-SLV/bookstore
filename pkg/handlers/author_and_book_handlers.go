@@ -8,14 +8,13 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v4"
 
-	"bookstore/models"
 	"bookstore/pkg/services"
 )
 
-type UpdateRequest struct {
-	Book   models.Book   `json:"book"`
-	Author models.Author `json:"author"`
-}
+//type UpdateRequest struct {
+//	Book   models.Book   `json:"book"`
+//	Author models.Author `json:"author"`
+//}
 
 type AuthorAndBookHandler struct {
 	abSrv *services.AuthorAndBookService
@@ -40,21 +39,9 @@ func (ab AuthorAndBookHandler) UpdateBookAndAuthor(w http.ResponseWriter, r *htt
 		return
 	}
 
-	var updateRequest UpdateRequest
-	if err := json.NewDecoder(r.Body).Decode(&updateRequest); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	dec := json.NewDecoder(r.Body)
 
-	if updateRequest.Book.ID != bookID || updateRequest.Author.ID != authorID {
-		http.Error(w, "Mismatched book or author ID", http.StatusBadRequest)
-		return
-	}
-
-	book := updateRequest.Book
-	author := updateRequest.Author
-
-	err = ab.abSrv.UpdateBookAndAuthor(r.Context(), &book, &author)
+	err = ab.abSrv.UpdateBookAndAuthor(r.Context(), dec, bookID, authorID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

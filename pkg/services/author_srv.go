@@ -1,21 +1,11 @@
 package services
 
 import (
-	"context"
-	"encoding/json"
-	"time"
-
 	"bookstore/models"
 	"bookstore/pkg/repositories/postgre"
+	"context"
+	"encoding/json"
 )
-
-type author struct {
-	ID        int    `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Biography string `json:"biography"`
-	BirthDate string `json:"birth_date"`
-}
 
 type AuthorService struct {
 	authorRep *postgre.AuthorPgRepository
@@ -27,7 +17,7 @@ func NewAuthorService(authorRep *postgre.AuthorPgRepository) *AuthorService {
 
 func (a AuthorService) CreateAuthor(ctx context.Context, dec *json.Decoder) (int, error) {
 	var mAuthor models.Author
-	var author author
+	var author Author
 
 	err := dec.Decode(&author)
 	if err != nil {
@@ -51,7 +41,7 @@ func (a AuthorService) GetAuthorByID(ctx context.Context, id int) (*models.Autho
 
 func (a AuthorService) UpdateAuthor(ctx context.Context, dec *json.Decoder, id int) error {
 	var mAuthor models.Author
-	var author author
+	var author Author
 
 	err := dec.Decode(&author)
 	if err != nil {
@@ -68,19 +58,4 @@ func (a AuthorService) UpdateAuthor(ctx context.Context, dec *json.Decoder, id i
 
 func (a AuthorService) DeleteAuthor(ctx context.Context, id int) error {
 	return a.authorRep.DeleteAuthor(ctx, id)
-}
-
-func parseAuthor(receiver *models.Author, source *author) error {
-	receiver.ID = source.ID
-	receiver.FirstName = source.FirstName
-	receiver.LastName = source.LastName
-	receiver.Biography = source.Biography
-
-	BirthDate, err := time.Parse(time.DateOnly, source.BirthDate)
-	if err != nil {
-		return err
-	}
-	receiver.BirthDate = BirthDate
-
-	return nil
 }
