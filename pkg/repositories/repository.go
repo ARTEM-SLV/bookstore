@@ -30,7 +30,7 @@ type AuthorAndBookRepository interface {
 }
 
 type Repository struct {
-	BookRepository          *postgre.BookPgRepository
+	BookRepository          *postgre.BookRepositoryPg
 	AuthorRepository        *postgre.AuthorPgRepository
 	AuthorAndBookRepository *postgre.AuthorAndBookPgRep
 }

@@ -13,18 +13,16 @@ import (
 )
 
 type AuthorHandler struct {
-	authorSrv *services.AuthorService
+	authorSrv services.AuthorService
 }
 
-func NewAuthorHandler(authorSrv *services.AuthorService) *AuthorHandler {
+func NewAuthorHandler(authorSrv services.AuthorService) *AuthorHandler {
 	return &AuthorHandler{authorSrv: authorSrv}
 }
 
 // CreateAuthor handles POST /authors
 func (a *AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
-	dec := json.NewDecoder(r.Body)
-
-	id, err := a.authorSrv.CreateAuthor(r.Context(), dec)
+	id, err := a.authorSrv.CreateAuthor(r.Context(), r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -79,9 +77,7 @@ func (a *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dec := json.NewDecoder(r.Body)
-
-	err = a.authorSrv.UpdateAuthor(r.Context(), dec, id)
+	err = a.authorSrv.UpdateAuthor(r.Context(), r.Body, id)
 	if err == pgx.ErrNoRows {
 		http.Error(w, "Author not found", http.StatusInternalServerError)
 		return

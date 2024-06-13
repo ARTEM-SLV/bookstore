@@ -9,28 +9,20 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v4"
 
-	"bookstore/models"
 	"bookstore/pkg/services"
 )
 
 type BookHandler struct {
-	bookSrv *services.BookService
+	bookSrv services.BookService
 }
 
-func NewBookHandler(bookSrv *services.BookService) *BookHandler {
+func NewBookHandler(bookSrv services.BookService) *BookHandler {
 	return &BookHandler{bookSrv: bookSrv}
 }
 
 // CreateBook handles POST /books
 func (b *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
-	var book models.Book
-	err := json.NewDecoder(r.Body).Decode(&book)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	id, err := b.bookSrv.CreateBook(r.Context(), &book)
+	id, err := b.bookSrv.CreateBook(r.Context(), r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -84,15 +76,7 @@ func (b *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var book models.Book
-	err = json.NewDecoder(r.Body).Decode(&book)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	book.ID = id
-
-	err = b.bookSrv.UpdateBook(r.Context(), &book)
+	err = b.bookSrv.UpdateBook(r.Context(), r.Body, id)
 	if err == pgx.ErrNoRows {
 		http.Error(w, "Book not found", http.StatusNotFound)
 		return

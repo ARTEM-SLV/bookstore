@@ -1,9 +1,12 @@
 package services
 
 import (
+	"context"
+	"io"
+	"time"
+
 	"bookstore/models"
 	"bookstore/pkg/repositories"
-	"time"
 )
 
 type Author struct {
@@ -14,10 +17,31 @@ type Author struct {
 	BirthDate string `json:"birth_date"`
 }
 
+type BookService interface {
+	CreateBook(ctx context.Context, r io.Reader) (int, error)
+	GetAllBooks(ctx context.Context) ([]*models.Book, error)
+	GetBookByID(ctx context.Context, id int) (*models.Book, error)
+	UpdateBook(ctx context.Context, r io.Reader, id int) error
+	DeleteBook(ctx context.Context, id int) error
+}
+
+type AuthorService interface {
+	CreateAuthor(ctx context.Context, r io.Reader) (int, error)
+	GetAllAuthors(ctx context.Context) ([]*models.Author, error)
+	GetAuthorByID(ctx context.Context, id int) (*models.Author, error)
+	UpdateAuthor(ctx context.Context, r io.Reader, id int) error
+	DeleteAuthor(ctx context.Context, id int) error
+}
+
+type AuthorAndBookService interface {
+	UpdateBookAndAuthor(ctx context.Context, r io.Reader, bookID, authorID int) error
+	GetAuthorAndBooks(ctx context.Context, id int) (*models.Author, []*models.Book, error)
+}
+
 type Service struct {
-	BookSrv          *BookService
-	AuthorSrv        *AuthorService
-	AuthorAndBookSrv *AuthorAndBookService
+	BookSrv          *BookServicePg
+	AuthorSrv        *AuthorServicePg
+	AuthorAndBookSrv *AuthorAndBookServicePg
 }
 
 func NewService(rep *repositories.Repository) *Service {

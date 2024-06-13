@@ -1,10 +1,12 @@
 package services
 
 import (
-	"bookstore/models"
-	"bookstore/pkg/repositories"
 	"context"
 	"encoding/json"
+	"io"
+
+	"bookstore/models"
+	"bookstore/pkg/repositories"
 )
 
 type UpdateRequest struct {
@@ -12,31 +14,33 @@ type UpdateRequest struct {
 	Author Author      `json:"author"`
 }
 
-type AuthorAndBookService struct {
+type AuthorAndBookServicePg struct {
 	authorAndBookRep repositories.AuthorAndBookRepository
 }
 
-func NewAuthorAndBookService(authorAndBookRep repositories.AuthorAndBookRepository) *AuthorAndBookService {
-	return &AuthorAndBookService{authorAndBookRep: authorAndBookRep}
+func NewAuthorAndBookService(authorAndBookRep repositories.AuthorAndBookRepository) *AuthorAndBookServicePg {
+	return &AuthorAndBookServicePg{authorAndBookRep: authorAndBookRep}
 }
 
-func (a *AuthorAndBookService) UpdateBookAndAuthor(ctx context.Context, dec *json.Decoder, bookID, authorID int) error {
+func (a *AuthorAndBookServicePg) UpdateBookAndAuthor(ctx context.Context, r io.Reader, bookID, authorID int) error {
 	var mAuthor models.Author
 
 	var updateRequest UpdateRequest
-	err := dec.Decode(&updateRequest)
+	err := json.NewDecoder(r).Decode(&updateRequest)
 	if err != nil {
 		return err
 	}
 
 	book := updateRequest.Book
 	author := updateRequest.Author
+	book.ID = bookID
+	author.ID = authorID
 
 	parseAuthor(&mAuthor, &author)
 
 	return a.authorAndBookRep.UpdateBookAndAuthor(ctx, &book, &mAuthor)
 }
 
-func (a *AuthorAndBookService) GetAuthorAndBooks(ctx context.Context, id int) (*models.Author, []*models.Book, error) {
+func (a *AuthorAndBookServicePg) GetAuthorAndBooks(ctx context.Context, id int) (*models.Author, []*models.Book, error) {
 	return a.authorAndBookRep.GetAuthorAndBooks(ctx, id)
 }

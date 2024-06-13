@@ -12,10 +12,10 @@ import (
 )
 
 type AuthorAndBookHandler struct {
-	abSrv *services.AuthorAndBookService
+	abSrv services.AuthorAndBookService
 }
 
-func NewAuthorAndBookHandler(abSrv *services.AuthorAndBookService) *AuthorAndBookHandler {
+func NewAuthorAndBookHandler(abSrv services.AuthorAndBookService) *AuthorAndBookHandler {
 	return &AuthorAndBookHandler{abSrv: abSrv}
 }
 
@@ -34,9 +34,7 @@ func (ab *AuthorAndBookHandler) UpdateBookAndAuthor(w http.ResponseWriter, r *ht
 		return
 	}
 
-	dec := json.NewDecoder(r.Body)
-
-	err = ab.abSrv.UpdateBookAndAuthor(r.Context(), dec, bookID, authorID)
+	err = ab.abSrv.UpdateBookAndAuthor(r.Context(), r.Body, bookID, authorID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
