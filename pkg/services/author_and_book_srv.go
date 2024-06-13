@@ -2,7 +2,7 @@ package services
 
 import (
 	"bookstore/models"
-	"bookstore/pkg/repositories/postgre"
+	"bookstore/pkg/repositories"
 	"context"
 	"encoding/json"
 )
@@ -13,14 +13,14 @@ type UpdateRequest struct {
 }
 
 type AuthorAndBookService struct {
-	authorAndBookRep *postgre.AuthorAndBookPgRep
+	authorAndBookRep repositories.AuthorAndBookRepository
 }
 
-func NewAuthorAndBookService(authorAndBookRep *postgre.AuthorAndBookPgRep) *AuthorAndBookService {
+func NewAuthorAndBookService(authorAndBookRep repositories.AuthorAndBookRepository) *AuthorAndBookService {
 	return &AuthorAndBookService{authorAndBookRep: authorAndBookRep}
 }
 
-func (a AuthorAndBookService) UpdateBookAndAuthor(ctx context.Context, dec *json.Decoder, bookID, authorID int) error {
+func (a *AuthorAndBookService) UpdateBookAndAuthor(ctx context.Context, dec *json.Decoder, bookID, authorID int) error {
 	var mAuthor models.Author
 
 	var updateRequest UpdateRequest
@@ -37,6 +37,6 @@ func (a AuthorAndBookService) UpdateBookAndAuthor(ctx context.Context, dec *json
 	return a.authorAndBookRep.UpdateBookAndAuthor(ctx, &book, &mAuthor)
 }
 
-func (a AuthorAndBookService) GetAuthorAndBooks(ctx context.Context, id int) (*models.Author, []*models.Book, error) {
+func (a *AuthorAndBookService) GetAuthorAndBooks(ctx context.Context, id int) (*models.Author, []*models.Book, error) {
 	return a.authorAndBookRep.GetAuthorAndBooks(ctx, id)
 }

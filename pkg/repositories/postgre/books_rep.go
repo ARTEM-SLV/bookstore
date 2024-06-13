@@ -16,7 +16,7 @@ func NewBookRepository(pool *pgxpool.Pool) *BookPgRepository {
 	return &BookPgRepository{pool: pool}
 }
 
-func (b BookPgRepository) CreateBook(ctx context.Context, book *models.Book) (int, error) {
+func (b *BookPgRepository) CreateBook(ctx context.Context, book *models.Book) (int, error) {
 	conn, err := b.pool.Acquire(ctx)
 	if err != nil {
 		return 0, err
@@ -32,7 +32,7 @@ func (b BookPgRepository) CreateBook(ctx context.Context, book *models.Book) (in
 	return book.ID, nil
 }
 
-func (b BookPgRepository) GetAllBooks(ctx context.Context) ([]*models.Book, error) {
+func (b *BookPgRepository) GetAllBooks(ctx context.Context) ([]*models.Book, error) {
 	var books []*models.Book
 
 	conn, err := b.pool.Acquire(ctx)
@@ -59,7 +59,7 @@ func (b BookPgRepository) GetAllBooks(ctx context.Context) ([]*models.Book, erro
 	return books, nil
 }
 
-func (b BookPgRepository) GetBookByID(ctx context.Context, id int) (*models.Book, error) {
+func (b *BookPgRepository) GetBookByID(ctx context.Context, id int) (*models.Book, error) {
 	var book models.Book
 
 	conn, err := b.pool.Acquire(ctx)
@@ -77,7 +77,7 @@ func (b BookPgRepository) GetBookByID(ctx context.Context, id int) (*models.Book
 	return &book, nil
 }
 
-func (b BookPgRepository) UpdateBook(ctx context.Context, book *models.Book) error {
+func (b *BookPgRepository) UpdateBook(ctx context.Context, book *models.Book) error {
 	conn, err := b.pool.Acquire(ctx)
 	if err != nil {
 		return err
@@ -93,7 +93,7 @@ func (b BookPgRepository) UpdateBook(ctx context.Context, book *models.Book) err
 	return nil
 }
 
-func (b BookPgRepository) DeleteBook(ctx context.Context, id int) error {
+func (b *BookPgRepository) DeleteBook(ctx context.Context, id int) error {
 	conn, err := b.pool.Acquire(ctx)
 	if err != nil {
 		return err

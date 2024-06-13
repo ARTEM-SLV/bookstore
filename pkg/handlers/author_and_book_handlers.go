@@ -20,7 +20,7 @@ func NewAuthorAndBookHandler(abSrv *services.AuthorAndBookService) *AuthorAndBoo
 }
 
 // UpdateBookAndAuthor handles PUT /books/{book_id}/authors/{author_id}
-func (ab AuthorAndBookHandler) UpdateBookAndAuthor(w http.ResponseWriter, r *http.Request) {
+func (ab *AuthorAndBookHandler) UpdateBookAndAuthor(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	bookID, err := strconv.Atoi(vars["book_id"])
 	if err != nil {

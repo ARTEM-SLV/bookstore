@@ -16,7 +16,7 @@ func NewAuthorRepository(pool *pgxpool.Pool) *AuthorPgRepository {
 	return &AuthorPgRepository{pool: pool}
 }
 
-func (a AuthorPgRepository) CreateAuthor(ctx context.Context, author *models.Author) (int, error) {
+func (a *AuthorPgRepository) CreateAuthor(ctx context.Context, author *models.Author) (int, error) {
 	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
 		return 0, err
@@ -32,7 +32,7 @@ func (a AuthorPgRepository) CreateAuthor(ctx context.Context, author *models.Aut
 	return author.ID, nil
 }
 
-func (a AuthorPgRepository) GetAllAuthors(ctx context.Context) ([]*models.Author, error) {
+func (a *AuthorPgRepository) GetAllAuthors(ctx context.Context) ([]*models.Author, error) {
 	var authors []*models.Author
 
 	conn, err := a.pool.Acquire(ctx)
@@ -61,7 +61,7 @@ func (a AuthorPgRepository) GetAllAuthors(ctx context.Context) ([]*models.Author
 	return authors, nil
 }
 
-func (a AuthorPgRepository) GetAuthorByID(ctx context.Context, id int) (*models.Author, error) {
+func (a *AuthorPgRepository) GetAuthorByID(ctx context.Context, id int) (*models.Author, error) {
 	var author models.Author
 
 	conn, err := a.pool.Acquire(ctx)
@@ -79,7 +79,7 @@ func (a AuthorPgRepository) GetAuthorByID(ctx context.Context, id int) (*models.
 	return &author, nil
 }
 
-func (a AuthorPgRepository) UpdateAuthor(ctx context.Context, author *models.Author) error {
+func (a *AuthorPgRepository) UpdateAuthor(ctx context.Context, author *models.Author) error {
 	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (a AuthorPgRepository) UpdateAuthor(ctx context.Context, author *models.Aut
 	return nil
 }
 
-func (a AuthorPgRepository) DeleteAuthor(ctx context.Context, id int) error {
+func (a *AuthorPgRepository) DeleteAuthor(ctx context.Context, id int) error {
 	tx, err := a.pool.Begin(ctx)
 	if err != nil {
 		return err

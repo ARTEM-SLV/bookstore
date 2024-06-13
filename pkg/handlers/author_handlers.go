@@ -21,7 +21,7 @@ func NewAuthorHandler(authorSrv *services.AuthorService) *AuthorHandler {
 }
 
 // CreateAuthor handles POST /authors
-func (a AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
+func (a *AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	dec := json.NewDecoder(r.Body)
 
 	id, err := a.authorSrv.CreateAuthor(r.Context(), dec)
@@ -36,7 +36,7 @@ func (a AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAuthors handles GET /authors
-func (a AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request) {
+func (a *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request) {
 	authors, err := a.authorSrv.GetAllAuthors(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -47,7 +47,7 @@ func (a AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAuthor handles GET /authors/{id}
-func (a AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
+func (a *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -71,7 +71,7 @@ func (a AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateAuthor handles PUT /authors/{id}
-func (a AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
+func (a *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -93,7 +93,7 @@ func (a AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteAuthor handles DELETE /authors/{id}
-func (a AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
+func (a *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {

@@ -22,7 +22,7 @@ func NewBookHandler(bookSrv *services.BookService) *BookHandler {
 }
 
 // CreateBook handles POST /books
-func (b BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
+func (b *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	var book models.Book
 	err := json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
@@ -42,7 +42,7 @@ func (b BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetBooks handles GET /books
-func (b BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
+func (b *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 	books, err := b.bookSrv.GetAllBooks(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -53,7 +53,7 @@ func (b BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetBook handles GET /books/{id}
-func (b BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
+func (b *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -76,7 +76,7 @@ func (b BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateBook handles PUT /books/{id}
-func (b BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
+func (b *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -104,7 +104,7 @@ func (b BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteBook handles DELETE /books/{id}
-func (b BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
+func (b *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {

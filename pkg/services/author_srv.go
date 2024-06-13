@@ -2,20 +2,20 @@ package services
 
 import (
 	"bookstore/models"
-	"bookstore/pkg/repositories/postgre"
+	"bookstore/pkg/repositories"
 	"context"
 	"encoding/json"
 )
 
 type AuthorService struct {
-	authorRep *postgre.AuthorPgRepository
+	authorRep repositories.AuthorRepository
 }
 
-func NewAuthorService(authorRep *postgre.AuthorPgRepository) *AuthorService {
+func NewAuthorService(authorRep repositories.AuthorRepository) *AuthorService {
 	return &AuthorService{authorRep: authorRep}
 }
 
-func (a AuthorService) CreateAuthor(ctx context.Context, dec *json.Decoder) (int, error) {
+func (a *AuthorService) CreateAuthor(ctx context.Context, dec *json.Decoder) (int, error) {
 	var mAuthor models.Author
 	var author Author
 
@@ -31,15 +31,15 @@ func (a AuthorService) CreateAuthor(ctx context.Context, dec *json.Decoder) (int
 	return a.authorRep.CreateAuthor(ctx, &mAuthor)
 }
 
-func (a AuthorService) GetAllAuthors(ctx context.Context) ([]*models.Author, error) {
+func (a *AuthorService) GetAllAuthors(ctx context.Context) ([]*models.Author, error) {
 	return a.authorRep.GetAllAuthors(ctx)
 }
 
-func (a AuthorService) GetAuthorByID(ctx context.Context, id int) (*models.Author, error) {
+func (a *AuthorService) GetAuthorByID(ctx context.Context, id int) (*models.Author, error) {
 	return a.authorRep.GetAuthorByID(ctx, id)
 }
 
-func (a AuthorService) UpdateAuthor(ctx context.Context, dec *json.Decoder, id int) error {
+func (a *AuthorService) UpdateAuthor(ctx context.Context, dec *json.Decoder, id int) error {
 	var mAuthor models.Author
 	var author Author
 
@@ -56,6 +56,6 @@ func (a AuthorService) UpdateAuthor(ctx context.Context, dec *json.Decoder, id i
 	return a.authorRep.UpdateAuthor(ctx, &mAuthor)
 }
 
-func (a AuthorService) DeleteAuthor(ctx context.Context, id int) error {
+func (a *AuthorService) DeleteAuthor(ctx context.Context, id int) error {
 	return a.authorRep.DeleteAuthor(ctx, id)
 }
