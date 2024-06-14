@@ -39,9 +39,9 @@ type AuthorAndBookService interface {
 }
 
 type Service struct {
-	BookSrv          *BookServicePg
-	AuthorSrv        *AuthorServicePg
-	AuthorAndBookSrv *AuthorAndBookServicePg
+	BookSrv          *BookSrv
+	AuthorSrv        *AuthorSrv
+	AuthorAndBookSrv *AuthorAndBookSrv
 }
 
 func NewService(rep *repositories.Repository) *Service {

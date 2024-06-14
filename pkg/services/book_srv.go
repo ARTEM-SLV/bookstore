@@ -7,18 +7,17 @@ import (
 
 	"bookstore/models"
 	"bookstore/pkg/repositories"
-	"bookstore/pkg/repositories/postgre"
 )
 
-type BookServicePg struct {
+type BookSrv struct {
 	bookRep repositories.BookRepository
 }
 
-func NewBookService(bookRep *postgre.BookRepositoryPg) *BookServicePg {
-	return &BookServicePg{bookRep: bookRep}
+func NewBookService(bookRep repositories.BookRepository) *BookSrv {
+	return &BookSrv{bookRep: bookRep}
 }
 
-func (b *BookServicePg) CreateBook(ctx context.Context, r io.Reader) (int, error) {
+func (b *BookSrv) CreateBook(ctx context.Context, r io.Reader) (int, error) {
 	var book models.Book
 	err := json.NewDecoder(r).Decode(&book)
 	if err != nil {
@@ -28,15 +27,15 @@ func (b *BookServicePg) CreateBook(ctx context.Context, r io.Reader) (int, error
 	return b.bookRep.CreateBook(ctx, &book)
 }
 
-func (b *BookServicePg) GetAllBooks(ctx context.Context) ([]*models.Book, error) {
+func (b *BookSrv) GetAllBooks(ctx context.Context) ([]*models.Book, error) {
 	return b.bookRep.GetAllBooks(ctx)
 }
 
-func (b *BookServicePg) GetBookByID(ctx context.Context, id int) (*models.Book, error) {
+func (b *BookSrv) GetBookByID(ctx context.Context, id int) (*models.Book, error) {
 	return b.bookRep.GetBookByID(ctx, id)
 }
 
-func (b *BookServicePg) UpdateBook(ctx context.Context, r io.Reader, id int) error {
+func (b *BookSrv) UpdateBook(ctx context.Context, r io.Reader, id int) error {
 	var book models.Book
 	err := json.NewDecoder(r).Decode(&book)
 	if err != nil {
@@ -47,6 +46,6 @@ func (b *BookServicePg) UpdateBook(ctx context.Context, r io.Reader, id int) err
 	return b.bookRep.UpdateBook(ctx, &book)
 }
 
-func (b *BookServicePg) DeleteBook(ctx context.Context, id int) error {
+func (b *BookSrv) DeleteBook(ctx context.Context, id int) error {
 	return b.bookRep.DeleteBook(ctx, id)
 }

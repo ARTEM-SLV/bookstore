@@ -14,15 +14,15 @@ type UpdateRequest struct {
 	Author Author      `json:"author"`
 }
 
-type AuthorAndBookServicePg struct {
+type AuthorAndBookSrv struct {
 	authorAndBookRep repositories.AuthorAndBookRepository
 }
 
-func NewAuthorAndBookService(authorAndBookRep repositories.AuthorAndBookRepository) *AuthorAndBookServicePg {
-	return &AuthorAndBookServicePg{authorAndBookRep: authorAndBookRep}
+func NewAuthorAndBookService(authorAndBookRep repositories.AuthorAndBookRepository) *AuthorAndBookSrv {
+	return &AuthorAndBookSrv{authorAndBookRep: authorAndBookRep}
 }
 
-func (a *AuthorAndBookServicePg) UpdateBookAndAuthor(ctx context.Context, r io.Reader, bookID, authorID int) error {
+func (a *AuthorAndBookSrv) UpdateBookAndAuthor(ctx context.Context, r io.Reader, bookID, authorID int) error {
 	var mAuthor models.Author
 
 	var updateRequest UpdateRequest
@@ -41,6 +41,6 @@ func (a *AuthorAndBookServicePg) UpdateBookAndAuthor(ctx context.Context, r io.R
 	return a.authorAndBookRep.UpdateBookAndAuthor(ctx, &book, &mAuthor)
 }
 
-func (a *AuthorAndBookServicePg) GetAuthorAndBooks(ctx context.Context, id int) (*models.Author, []*models.Book, error) {
+func (a *AuthorAndBookSrv) GetAuthorAndBooks(ctx context.Context, id int) (*models.Author, []*models.Book, error) {
 	return a.authorAndBookRep.GetAuthorAndBooks(ctx, id)
 }

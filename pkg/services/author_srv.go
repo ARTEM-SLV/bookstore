@@ -9,15 +9,15 @@ import (
 	"bookstore/pkg/repositories"
 )
 
-type AuthorServicePg struct {
+type AuthorSrv struct {
 	authorRep repositories.AuthorRepository
 }
 
-func NewAuthorService(authorRep repositories.AuthorRepository) *AuthorServicePg {
-	return &AuthorServicePg{authorRep: authorRep}
+func NewAuthorService(authorRep repositories.AuthorRepository) *AuthorSrv {
+	return &AuthorSrv{authorRep: authorRep}
 }
 
-func (a *AuthorServicePg) CreateAuthor(ctx context.Context, r io.Reader) (int, error) {
+func (a *AuthorSrv) CreateAuthor(ctx context.Context, r io.Reader) (int, error) {
 	var mAuthor models.Author
 	var author Author
 
@@ -33,15 +33,15 @@ func (a *AuthorServicePg) CreateAuthor(ctx context.Context, r io.Reader) (int, e
 	return a.authorRep.CreateAuthor(ctx, &mAuthor)
 }
 
-func (a *AuthorServicePg) GetAllAuthors(ctx context.Context) ([]*models.Author, error) {
+func (a *AuthorSrv) GetAllAuthors(ctx context.Context) ([]*models.Author, error) {
 	return a.authorRep.GetAllAuthors(ctx)
 }
 
-func (a *AuthorServicePg) GetAuthorByID(ctx context.Context, id int) (*models.Author, error) {
+func (a *AuthorSrv) GetAuthorByID(ctx context.Context, id int) (*models.Author, error) {
 	return a.authorRep.GetAuthorByID(ctx, id)
 }
 
-func (a *AuthorServicePg) UpdateAuthor(ctx context.Context, r io.Reader, id int) error {
+func (a *AuthorSrv) UpdateAuthor(ctx context.Context, r io.Reader, id int) error {
 	var mAuthor models.Author
 	var author Author
 
@@ -58,6 +58,6 @@ func (a *AuthorServicePg) UpdateAuthor(ctx context.Context, r io.Reader, id int)
 	return a.authorRep.UpdateAuthor(ctx, &mAuthor)
 }
 
-func (a *AuthorServicePg) DeleteAuthor(ctx context.Context, id int) error {
+func (a *AuthorSrv) DeleteAuthor(ctx context.Context, id int) error {
 	return a.authorRep.DeleteAuthor(ctx, id)
 }
