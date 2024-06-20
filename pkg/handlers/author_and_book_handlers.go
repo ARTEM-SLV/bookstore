@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v4"
 
+	"bookstore/internal/logger"
 	"bookstore/pkg/services"
 )
 
@@ -24,13 +25,17 @@ func (ab *AuthorAndBookHandler) UpdateBookAndAuthor(w http.ResponseWriter, r *ht
 	vars := mux.Vars(r)
 	bookID, err := strconv.Atoi(vars["book_id"])
 	if err != nil {
+		logger.Error(err.Error())
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
+
 		return
 	}
 
 	authorID, err := strconv.Atoi(vars["author_id"])
 	if err != nil {
+		logger.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
+
 		return
 	}
 
@@ -50,7 +55,9 @@ func (ab AuthorAndBookHandler) GetAuthorAndBooks(w http.ResponseWriter, r *http.
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
+		logger.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
+
 		return
 	}
 

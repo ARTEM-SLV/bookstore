@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v4"
 
+	"bookstore/internal/logger"
 	"bookstore/pkg/services"
 )
 
@@ -49,7 +50,9 @@ func (b *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
+		logger.Error(err.Error())
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
+
 		return
 	}
 
@@ -60,6 +63,7 @@ func (b *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+
 		return
 	}
 
@@ -72,7 +76,9 @@ func (b *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
+		logger.Error(err.Error())
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
+
 		return
 	}
 
@@ -92,7 +98,9 @@ func (b *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
+		logger.Error(err.Error())
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
+
 		return
 	}
 

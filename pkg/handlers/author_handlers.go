@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v4"
 
+	"bookstore/internal/logger"
 	"bookstore/pkg/services"
 )
 
@@ -17,7 +18,9 @@ type AuthorHandler struct {
 }
 
 func NewAuthorHandler(authorSrv services.AuthorService) *AuthorHandler {
-	return &AuthorHandler{authorSrv: authorSrv}
+	return &AuthorHandler{
+		authorSrv: authorSrv,
+	}
 }
 
 // CreateAuthor handles POST /authors
@@ -49,7 +52,9 @@ func (a *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
+		logger.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
+
 		return
 	}
 
@@ -57,11 +62,10 @@ func (a *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Author not found", http.StatusNotFound)
-			return
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -73,7 +77,9 @@ func (a *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
+		logger.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
+
 		return
 	}
 
@@ -93,7 +99,9 @@ func (a *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
+		logger.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
+
 		return
 	}
 
