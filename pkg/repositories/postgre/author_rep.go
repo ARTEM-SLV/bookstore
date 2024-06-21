@@ -21,7 +21,7 @@ func NewAuthorRepository(pool *pgxpool.Pool) *AuthorPgRepository {
 func (a *AuthorPgRepository) CreateAuthor(ctx context.Context, author *models.Author) (int, error) {
 	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return 0, err
 	}
 	defer conn.Release()
@@ -40,7 +40,7 @@ func (a *AuthorPgRepository) GetAllAuthors(ctx context.Context) ([]*models.Autho
 
 	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return authors, err
 	}
 	defer conn.Release()
@@ -48,7 +48,7 @@ func (a *AuthorPgRepository) GetAllAuthors(ctx context.Context) ([]*models.Autho
 	query := `SELECT id, first_name, last_name, biography, birth_date FROM authors`
 	rows, err := conn.Query(ctx, query)
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Log.Info(err.Error())
 		return authors, err
 	}
 	defer rows.Close()
@@ -57,7 +57,7 @@ func (a *AuthorPgRepository) GetAllAuthors(ctx context.Context) ([]*models.Autho
 		var author models.Author
 		err := rows.Scan(&author.ID, &author.FirstName, &author.LastName, &author.Biography, &author.BirthDate)
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Log.Error(err.Error())
 			return authors, err
 		}
 		authors = append(authors, &author)
@@ -71,7 +71,7 @@ func (a *AuthorPgRepository) GetAuthorByID(ctx context.Context, id int) (*models
 
 	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return &author, err
 	}
 	defer conn.Release()
@@ -79,7 +79,7 @@ func (a *AuthorPgRepository) GetAuthorByID(ctx context.Context, id int) (*models
 	query := "SELECT id, first_name, last_name, biography, birth_date FROM authors WHERE id=$1"
 	err = conn.QueryRow(ctx, query, id).Scan(&author.ID, &author.FirstName, &author.LastName, &author.Biography, &author.BirthDate)
 	if err != nil {
-		logger.Info(fmt.Sprintf("%s (id: %d)", err.Error(), id))
+		logger.Log.Info(fmt.Sprintf("%s (id: %d)", err.Error(), id))
 		return &author, err
 	}
 
@@ -89,7 +89,7 @@ func (a *AuthorPgRepository) GetAuthorByID(ctx context.Context, id int) (*models
 func (a *AuthorPgRepository) UpdateAuthor(ctx context.Context, author *models.Author) error {
 	conn, err := a.pool.Acquire(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return err
 	}
 	defer conn.Release()
@@ -97,7 +97,7 @@ func (a *AuthorPgRepository) UpdateAuthor(ctx context.Context, author *models.Au
 	query := "UPDATE authors SET first_name=$1, last_name=$2, biography=$3, birth_date=$4 WHERE id=$5"
 	_, err = conn.Exec(ctx, query, author.FirstName, author.LastName, author.Biography, author.BirthDate, author.ID)
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Log.Info(err.Error())
 		return err
 	}
 
@@ -107,7 +107,7 @@ func (a *AuthorPgRepository) UpdateAuthor(ctx context.Context, author *models.Au
 func (a *AuthorPgRepository) DeleteAuthor(ctx context.Context, id int) error {
 	tx, err := a.pool.Begin(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return err
 	}
 	defer tx.Rollback(ctx)
@@ -115,19 +115,19 @@ func (a *AuthorPgRepository) DeleteAuthor(ctx context.Context, id int) error {
 	query := "DELETE FROM books WHERE author_id=$1"
 	_, err = tx.Exec(ctx, query, id)
 	if err != nil {
-		logger.Info(fmt.Sprintf("%s (author_id: %d)", err.Error(), id))
+		logger.Log.Info(fmt.Sprintf("%s (author_id: %d)", err.Error(), id))
 		return err
 	}
 
 	query = "DELETE FROM authors WHERE id=$1"
 	_, err = tx.Exec(ctx, query, id)
 	if err != nil {
-		logger.Info(fmt.Sprintf("%s (id: %d)", err.Error(), id))
+		logger.Log.Info(fmt.Sprintf("%s (id: %d)", err.Error(), id))
 		return err
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return err
 	}
 

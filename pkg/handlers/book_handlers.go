@@ -23,6 +23,8 @@ func NewBookHandler(bookSrv services.BookService) *BookHandler {
 
 // CreateBook handles POST /books
 func (b *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	id, err := b.bookSrv.CreateBook(r.Context(), r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -36,6 +38,8 @@ func (b *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 
 // GetBooks handles GET /books
 func (b *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	books, err := b.bookSrv.GetAllBooks(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -47,10 +51,12 @@ func (b *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 
 // GetBook handles GET /books/{id}
 func (b *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 
 		return
@@ -73,10 +79,12 @@ func (b *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 
 // UpdateBook handles PUT /books/{id}
 func (b *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 
 		return
@@ -95,10 +103,12 @@ func (b *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 
 // DeleteBook handles DELETE /books/{id}
 func (b *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 
 		return

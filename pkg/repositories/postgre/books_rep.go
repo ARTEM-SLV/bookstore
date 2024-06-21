@@ -21,7 +21,7 @@ func NewBookRepository(pool *pgxpool.Pool) *BookRepositoryPg {
 func (b *BookRepositoryPg) CreateBook(ctx context.Context, book *models.Book) (int, error) {
 	conn, err := b.pool.Acquire(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return 0, err
 	}
 	defer conn.Release()
@@ -29,7 +29,7 @@ func (b *BookRepositoryPg) CreateBook(ctx context.Context, book *models.Book) (i
 	var query = `INSERT INTO books (title, author_id, year, isbn) VALUES ($1, $2, $3, $4) RETURNING id`
 	err = conn.QueryRow(ctx, query, book.Title, book.AuthorID, book.Year, book.ISBN).Scan(&book.ID)
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Log.Warn(err.Error())
 		return 0, err
 	}
 
@@ -41,7 +41,7 @@ func (b *BookRepositoryPg) GetAllBooks(ctx context.Context) ([]*models.Book, err
 
 	conn, err := b.pool.Acquire(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return books, err
 	}
 	defer conn.Release()
@@ -49,7 +49,7 @@ func (b *BookRepositoryPg) GetAllBooks(ctx context.Context) ([]*models.Book, err
 	query := `SELECT id, title, author_id, year, isbn FROM books`
 	rows, err := conn.Query(ctx, query)
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Log.Warn(err.Error())
 		return books, err
 	}
 	defer rows.Close()
@@ -58,7 +58,7 @@ func (b *BookRepositoryPg) GetAllBooks(ctx context.Context) ([]*models.Book, err
 		var book models.Book
 		err := rows.Scan(&book.ID, &book.Title, &book.AuthorID, &book.Year, &book.ISBN)
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Log.Error(err.Error())
 			return books, err
 		}
 		books = append(books, &book)
@@ -71,7 +71,7 @@ func (b *BookRepositoryPg) GetBookByID(ctx context.Context, id int) (*models.Boo
 
 	conn, err := b.pool.Acquire(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return &book, err
 	}
 	defer conn.Release()
@@ -79,7 +79,7 @@ func (b *BookRepositoryPg) GetBookByID(ctx context.Context, id int) (*models.Boo
 	query := `SELECT id, title, author_id, year, isbn FROM books WHERE id=$1`
 	err = conn.QueryRow(ctx, query, id).Scan(&book.ID, &book.Title, &book.AuthorID, &book.Year, &book.ISBN)
 	if err != nil {
-		logger.Info(fmt.Sprintf("%s (id: %d)", err.Error(), id))
+		logger.Log.Warn(fmt.Sprintf("%s (id: %d)", err.Error(), id))
 		return &book, err
 	}
 
@@ -89,7 +89,7 @@ func (b *BookRepositoryPg) GetBookByID(ctx context.Context, id int) (*models.Boo
 func (b *BookRepositoryPg) UpdateBook(ctx context.Context, book *models.Book) error {
 	conn, err := b.pool.Acquire(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return err
 	}
 	defer conn.Release()
@@ -97,7 +97,7 @@ func (b *BookRepositoryPg) UpdateBook(ctx context.Context, book *models.Book) er
 	query := "UPDATE books SET title=$1, author_id=$2, year=$3, isbn=$4 WHERE id=$5"
 	_, err = conn.Exec(ctx, query, book.Title, book.AuthorID, book.Year, book.ISBN, book.ID)
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Log.Warn(err.Error())
 		return err
 	}
 
@@ -107,7 +107,7 @@ func (b *BookRepositoryPg) UpdateBook(ctx context.Context, book *models.Book) er
 func (b *BookRepositoryPg) DeleteBook(ctx context.Context, id int) error {
 	conn, err := b.pool.Acquire(ctx)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		return err
 	}
 	defer conn.Release()
@@ -115,7 +115,7 @@ func (b *BookRepositoryPg) DeleteBook(ctx context.Context, id int) error {
 	query := "DELETE FROM books WHERE id=$1"
 	_, err = conn.Exec(ctx, query, id)
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Log.Warn(err.Error())
 		return err
 	}
 

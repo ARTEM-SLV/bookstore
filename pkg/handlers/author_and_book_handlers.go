@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -22,10 +23,12 @@ func NewAuthorAndBookHandler(abSrv services.AuthorAndBookService) *AuthorAndBook
 
 // UpdateBookAndAuthor handles PUT /books/{book_id}/authors/{author_id}
 func (ab *AuthorAndBookHandler) UpdateBookAndAuthor(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	vars := mux.Vars(r)
 	bookID, err := strconv.Atoi(vars["book_id"])
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 
 		return
@@ -33,7 +36,7 @@ func (ab *AuthorAndBookHandler) UpdateBookAndAuthor(w http.ResponseWriter, r *ht
 
 	authorID, err := strconv.Atoi(vars["author_id"])
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
 
 		return
@@ -52,10 +55,12 @@ func (ab *AuthorAndBookHandler) UpdateBookAndAuthor(w http.ResponseWriter, r *ht
 
 // GetAuthorAndBooks handles GET /author_with_books/{id}
 func (ab AuthorAndBookHandler) GetAuthorAndBooks(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
 
 		return

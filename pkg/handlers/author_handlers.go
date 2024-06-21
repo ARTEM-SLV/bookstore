@@ -25,6 +25,8 @@ func NewAuthorHandler(authorSrv services.AuthorService) *AuthorHandler {
 
 // CreateAuthor handles POST /authors
 func (a *AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	id, err := a.authorSrv.CreateAuthor(r.Context(), r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -38,6 +40,8 @@ func (a *AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 
 // GetAuthors handles GET /authors
 func (a *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	authors, err := a.authorSrv.GetAllAuthors(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -49,10 +53,12 @@ func (a *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request) {
 
 // GetAuthor handles GET /authors/{id}
 func (a *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
 
 		return
@@ -74,10 +80,12 @@ func (a *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
 
 // UpdateAuthor handles PUT /authors/{id}
 func (a *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
 
 		return
@@ -96,10 +104,12 @@ func (a *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 
 // DeleteAuthor handles DELETE /authors/{id}
 func (a *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
+	logger.Log.Info(fmt.Sprintf("URL: %s %s", r.URL.String(), r.Method))
+
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Log.Error(err.Error())
 		http.Error(w, "Invalid author ID", http.StatusBadRequest)
 
 		return
