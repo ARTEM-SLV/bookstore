@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bookstore/internal/logger"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"bookstore/internal/logger"
 	"bookstore/pkg/handlers"
 	"bookstore/pkg/repositories"
 	"bookstore/pkg/services"
