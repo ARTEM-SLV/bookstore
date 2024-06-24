@@ -23,7 +23,7 @@ func InitLogger() {
 			infoLogger:  log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile),
 			warnLogger:  log.New(os.Stdout, "WARN: ", log.Ldate|log.Ltime|log.Lshortfile),
 			errorLogger: log.New(os.Stdout, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile),
-			logFile:     file,
+			logFile:     nil,
 		}
 	} else {
 		l = Logger{
@@ -54,6 +54,10 @@ func (l *Logger) Error(msg string) {
 
 // CloseLog - метод для закрытия файла
 func (l *Logger) CloseLog() {
+	if l.logFile == nil {
+		return
+	}
+
 	err := l.logFile.Close()
 	if err != nil {
 		log.Printf("File close error: %s\n", err)
