@@ -30,9 +30,9 @@ type AuthorAndBookRepository interface {
 }
 
 type Repository struct {
-	BookRepository          *postgre.BookRepositoryPg
-	AuthorRepository        *postgre.AuthorPgRepository
-	AuthorAndBookRepository *postgre.AuthorAndBookPgRep
+	BookRepository          BookRepository
+	AuthorRepository        AuthorRepository
+	AuthorAndBookRepository AuthorAndBookRepository
 }
 
 func NewRepository() *Repository {
